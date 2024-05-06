@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-http-srv-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: basic-http-srv
+  template:
+    metadata:
+      labels:
+        app: basic-http-srv
+    spec:
+      containers:
+      - name: basic-http-srv-app
+        image: us-east1-docker.pkg.dev/tsvet-prj/basic-http-srv/basic-http-srv-gke:latest
+        ports:
+        - containerPort: 12345
+        env:
+          - name: HTTPSRV_PORT
+            value: "12345"
+          - name: HTTPSRV_BACKLOG
+            value: "10"
+          - name: HTTPSRV_RUNTIME
+            value: "0"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "1Gi"
