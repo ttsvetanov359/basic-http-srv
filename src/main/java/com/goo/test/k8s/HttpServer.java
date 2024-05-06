@@ -24,6 +24,8 @@ public class HttpServer implements Runnable {
     private final static int DFLT_RUNTIME = 0;
     private int port = DFLT_PORT;
     private int clients = DFLT_CLIENTS;
+    private int soTimeout = 2000;
+    private boolean soKeepalive = false;
     private ServerSocket ss = null;
 
     protected static boolean gcpLogging = System.getProperty("gcplogging") != null;
@@ -53,6 +55,16 @@ public class HttpServer implements Runnable {
     HttpServer(int port, int clients) {
         this.port = port;
         this.clients = clients;
+    }
+
+    void setSoTimeout(int timeout) {
+        if (timeout < 0)
+            return;
+        this.soTimeout = timeout;
+    }
+
+    void setSoKeepalive (boolean alive) {
+        this.soKeepalive = alive;
     }
 
     /*
@@ -157,7 +169,8 @@ public class HttpServer implements Runnable {
         @Override
         public void run() {
             try {
-                so.setSoTimeout(2000);
+                so.setSoTimeout(soTimeout);
+                so.setKeepAlive(soKeepalive);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(so.getInputStream()));
                 final int MAX_READ = 500;
                 char[] buff = new char[MAX_READ];
@@ -267,6 +280,13 @@ public class HttpServer implements Runnable {
         log(response);
 
         Runnable srv = new HttpServer(params.get("-p"), params.get("-b"));
+        if (params.containsKey("-soTime")) {
+            ((HttpServer)srv).setSoTimeout(params.get("-soTime"));
+        }
+        if (params.containsKey("-soAlive")) {
+            ((HttpServer)srv).setSoKeepalive(params.get("-soAlive") != 0);
+        }
+
         Thread t = new Thread(srv);
         t.start();
         log(srv + " started.");
