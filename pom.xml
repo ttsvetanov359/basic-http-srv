@@ -16,12 +16,32 @@
     <mainClass>com.goo.test.k8s.HttpServer</mainClass>
   </properties>
  
+  <dependencyManagement>
+    <dependencies>
+    <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>libraries-bom</artifactId>
+        <version>26.39.0</version> <!-- Latest libraries bom version -->
+        <type>pom</type>
+        <scope>import</scope>
+    </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <!-- Google Cloud Logging -->
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-logging-logback</artifactId>
       <version>0.130.27-alpha</version>
     </dependency>
+    <!-- Google Cloud Monitoring -->
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-monitoring</artifactId>
+      <version>3.44.0</version>
+    </dependency>
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

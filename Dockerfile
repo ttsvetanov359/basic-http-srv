@@ -35,14 +35,13 @@ RUN mvn -f /http-srv/pom.xml -DskipTests clean package
 # JDK runtime
 FROM openjdk:8-jre-slim
 COPY --from=build /http-srv/target/basic-http-srv-0.1.0.jar /usr/local/lib/basic-http-srv.jar
+COPY --from=build /http-srv/target/basic-http-srv-0.1.0.lib/*.jar /usr/local/lib/
 COPY --from=build /http-srv/src/main/java/logging.properties /usr/local/lib/logging.properties
-RUN ls -l /usr/local/lib/basic-http-srv.jar /usr/local/lib/logging.properties
+COPY --from=build /http-srv/service_account.json /usr/local/lib/
+COPY --from=build /http-srv/start.sh /usr/local/lib/
+RUN chmod +x /usr/local/lib/start.sh
+RUN /usr/local/lib/start.sh --dry-run
+RUN ls -l /usr/local/lib/*
 
 # Run the web service on container startup.
-# For some reason, the env variables are not getting replaced even though defined
-# in the deployment.yaml file.
-CMD ["java","-Dgcplogging",\
-  "-Djava.util.logging.config.file=/usr/local/lib/logging.properties",\
-  "-classpath","/usr/local/lib/basic-http-srv.jar",\
-  "com.goo.test.k8s.HttpServer",\
-  "-p","${HTTPSRV_PORT}","-b","${HTTPSRV_BACKLOG}","-t","${HTTPSRV_RUNTIME}"]
+CMD ["/usr/local/lib/start.sh"]

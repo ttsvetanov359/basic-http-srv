@@ -7,8 +7,9 @@ GCS_URL=gs://my-bucket-name/my-folder-name
 gsutil cp Dockerfile deployment.yaml service.yaml ${GCS_URL}
 ```
 
-Login to the cloud console.
-Get the `Dockerfile` from the GCS.
+Login to the cloud console. Get the `Dockerfile` from the GCS.
+This is the build file we will use for building and submitting the image
+in the Google AR:
 
 ```
 gsutil cp ${GCS_URL}/Dockerfile .
@@ -21,13 +22,17 @@ GCP_PROJECT_ID=tsvet-prj
 GCP_REPOSITORY_NAME=basic-http-srv
 GCP_REGION=us-east4
 GCP_IMAGE_NAME=basic-http-srv-gke
+
 ## The repo needs to be created once:
 gcloud artifacts repositories create "${GCP_REPOSITORY_NAME}" \
    --project="${GCP_PROJECT_ID}" \
    --repository-format=docker \
    --location="${GCP_REGION}" \
    --description="My docker repository for awesome images."
-gcloud builds submit --tag "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/${GCP_IMAGE_NAME}
+
+## Build the image
+gcloud builds submit --tag \
+"${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/${GCP_IMAGE_NAME}"
 ```
 
 Create the cluster.
@@ -57,6 +62,11 @@ kubectl get services
 kubectl get pods
 ```
 
+Delete the deployment in case you need to apply a new image:
+
+```
+kubectl delete deployment ${GCP_IMAGE_NAME} -n default
+```
 
 Cleanup the cluster.
 

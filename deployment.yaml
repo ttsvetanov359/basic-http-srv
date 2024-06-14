@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: basic-http-srv-app
-        image: us-east1-docker.pkg.dev/tsvet-prj/basic-http-srv/basic-http-srv-gke:latest
+        image: us-east4-docker.pkg.dev/tsvet-prj/basic-http-srv/basic-http-srv-gke:latest
         ports:
         - containerPort: 12345
         env:
@@ -24,6 +24,18 @@ spec:
             value: "10"
           - name: HTTPSRV_RUNTIME
             value: "0"
+          - name: JVM_MAX_HEAP_MB
+            value: "512"
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /usr/local/lib/service_account.json
+          - name: GKE_MONITORING_CLUSTER_NAME
+            value: basic-http-srv-gke
+          - name: GKE_MONITORING_CONTAINER_NAME
+            value: basic-http-srv-app
+          - name: GKE_MONITORING_LOCATION
+            value: us-east4
+          - name: GKE_MONITORING_NAMESPACE_NAME
+            value: default
         resources:
           requests:
             memory: "1Gi"
